@@ -1,0 +1,58 @@
+/*
+ * @file usercontrol.c
+ *
+ * @brief Contains the method for which the client will
+ * 		   put in their code to control their robot via
+ * 		   the vexNET Joystick.
+ *
+ * Copyright (C) 2016  Jordan M. Kieltyka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "main.h"
+
+/**
+ * Insert all joystick commands here and any other functions
+ * that will be used to control the robot during the Operator
+ * Control Period. This method will be run in a loop with a delay.
+ * Therefore there is no need to insert a loop or a delay in this method.
+ */
+void userControl(){
+
+	/* drive controls */
+	robot_joyDrive(DRIVER);	//control drive from joystick
+
+	/* lift controls */
+	const int MAX = 1500;				//maximum value the lift should go to
+	const int MIN = 0;					//minimum value the lift should go to
+	const int ADDEND = 5;				//value to add or subtract from position
+	static int position = MIN;	//the target position for the lift
+
+	//lift button controls
+	if(position < MAX && joystickGetDigital(DRIVER, 5, JOY_UP))					//increase lift position
+		position += ADDEND;
+	else if(position > MIN && joystickGetDigital(DRIVER, 5, JOY_DOWN))	//decrease lift position
+		position -= ADDEND;
+
+	robot_liftToPosition(position);	//have lift raise to position
+
+	/* intake controls */
+	if(joystickGetDigital(DRIVER, 6, JOY_UP))					//open claw
+		robot_intakeIn();
+	else if(joystickGetDigital(DRIVER, 6, JOY_DOWN))	//close claw
+		robot_intakeOut();
+	else
+		robot_intakeStop();															//stop claw
+}
