@@ -82,7 +82,7 @@ void initialize() {
 
 	//initialize motor systems
 	Robot.rightDrive = motorSystem_init(3, &m7, &m8, &m9); //initialize right drive
-	Robot.rightDrive = motorSystem_init(3, &m2, &m3, &m4); //initialize left drive
+	Robot.leftDrive = motorSystem_init(3, &m2, &m3, &m4);  //initialize left drive
 	Robot.lift = motorSystem_init(2, &m5, &m6);						 //initialize lift
 	Robot.intake = motorSystem_init(2, &m1, &m10);				 //initialize claw
 
