@@ -35,18 +35,12 @@ void userControl(){
 	robot_joyDrive(DRIVER);	//control drive from joystick
 
 	/* lift controls */
-	const int MAX = 1500;				//maximum value the lift should go to
-	const int MIN = 0;					//minimum value the lift should go to
-	const int ADDEND = 5;				//value to add or subtract from position
-	static int position = MIN;	//the target position for the lift
-
-	//lift button controls
-	if(position < MAX && joystickGetDigital(DRIVER, 5, JOY_UP))					//increase lift position
-		position += ADDEND;
-	else if(position > MIN && joystickGetDigital(DRIVER, 5, JOY_DOWN))	//decrease lift position
-		position -= ADDEND;
-
-	robot_liftToPosition(position);	//have lift raise to position
+ if(joystickGetDigital(DRIVER, 5, JOY_UP))	//increase lift position
+ 	motorSystem_setVelocity(&Robot.lift, 127);
+ else if(joystickGetDigital(DRIVER, 5, JOY_DOWN))	//decrease lift position
+ 	motorSystem_setVelocity(&Robot.lift, -127);
+ else
+ 	motorSystem_stop(&Robot.lift);	//stop lift
 
 	/* intake controls */
 	if(joystickGetDigital(DRIVER, 6, JOY_UP))					//open claw
