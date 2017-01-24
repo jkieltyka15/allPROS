@@ -112,11 +112,17 @@ void robot_replay(const char* name){
  */
 void writeMotorValue(FILE* file, int port){
 	int velocity = motorGet(port) + 127;
-	fputc(itoc(velocity/100), file);
-	velocity %= 100;
-	fputc(itoc(velocity/10), file);
-	velocity %= 10;
-	fputc(itoc(velocity), file);
+	char hex[2];
+
+	//convert  to hexadecimal digit
+	for(int i = 0; i < 2; i++){
+			hex[i] = velocity % 16;
+	    velocity = velocity / 16;
+	}
+
+	//write hexadecimal digit to file
+	for(int i = 1; i >= 0; i--)
+		fputc(itoc(hex[i]), file);
 }
 
 /*
@@ -124,12 +130,7 @@ void writeMotorValue(FILE* file, int port){
  *
  * @param The velocity from the file.
  */
-int readMotorValue(FILE* file){
-	int velocity = 0;
-	velocity = ctoi(fgetc(file))*100;
-	velocity += ctoi(fgetc(file))*10;
-	return (velocity + ctoi(fgetc(file)) - 127);
-}
+int readMotorValue(FILE* file){return (ctoi(fgetc(file))*16 + ctoi(fgetc(file)) - 127);}
 
 /*
  * Write the state of the digital port to the desired
@@ -148,15 +149,25 @@ int readDigitalPortValue(FILE* file){return ctoi(fgetc(file));}
 /*
  * Convert a digit value to the ASCII equivalent.
  *
- * @param i A number between 0 and 9.
+ * @param i A number between 0 and F.
  * @return The ASCII value of the digit.
  */
-char itoc(int i){return i + '0';}
+char itoc(int i){
+	if(i < 10)
+		return i + '0';				//number is a digit
+	else
+		return i - 10 + 'A';	//number is a letter
+}
 
 /*
- * Convert and ASCII value from '0' to '9' to its integer equivalent.
+ * Convert and ASCII value from '0' to 'F' to its integer equivalent.
  *
  * @param c The ACII character to be converted.
  * @return The integer value of the ASCII character.
  */
-int ctoi(char c){return c - '0';}
+int ctoi(char c){
+	if(c <= '9')
+		return c - '0';				//character is a digit
+	else
+		return c + 10 - 'A';	//character is a letter
+}
