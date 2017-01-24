@@ -69,7 +69,7 @@ void initialize() {
 	Motor m2 = motor_init(PORT_2, true); 	 //create motor for port 2
 	Motor m3 = motor_init(PORT_3, true); 	 //create motor for port 3
 	Motor m4 = motor_init(PORT_4, true); 	 //create motor for port 4
-	Motor m5 = motor_init(PORT_5, false);  //create motor for port 5
+	Motor m5 = motor_init(PORT_5, true);   //create motor for port 5
 	Motor m6 = motor_init(PORT_6, true); 	 //create motor for port 6
 	Motor m7 = motor_init(PORT_7, false);  //create motor for port 7
 	Motor m8 = motor_init(PORT_8, false);  //create motor for port 8
