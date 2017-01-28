@@ -93,18 +93,30 @@ double robot_getLiftConst(){
 void robot_lcdMenu(){
 
 	lcd_backLight(&Robot.lcd, ON);	//turn on the robot's lcd backlight
+	lcd_clear(&Robot.lcd);					//clear lcd
 
-	//display battery status
-	while(lcd_buttonPressed(Robot.lcd) == 0){
-		lcd_clear(&Robot.lcd);																																	//clear lcd
-		lcdPrint(Robot.lcd.port, TOP, "Primary: %1.2f V", (double)(powerLevelMain()/1000));			//display main battery voltage
-		lcdPrint(Robot.lcd.port, BOTTOM, "Backup: %1.2f V", (double)(powerLevelBackup()/1000));	//display backup battery voltage
+	//splash-screen
+	lcd_centerPrint(&Robot.lcd, TOP, "Property of:");					//print lcd
+	lcd_centerPrint(&Robot.lcd, BOTTOM, "NDA ROBOTICS");			//print lcd
+	delay(1500);																							//delay to make lcd readable
+	lcd_clear(&Robot.lcd);																		//clear lcd
+
+	//display low battery warning until battery is replace
+	while(powerLevelMain() <= 6000){
+		lcd_centerPrint(&Robot.lcd, TOP, "WARNING!!!");						//print lcd warning
+		lcd_centerPrint(&Robot.lcd, BOTTOM, "Battery Critical");	//print lcd warning
+		lcd_backLight(&Robot.lcd, !lcd_backLightIsOn(Robot.lcd));	//toggle the robot's lcd backlight
+		delay(250);																								//delay to make strobe visible
 	}
 
+	lcd_backLight(&Robot.lcd, ON);	//turn on the robot's lcd backlight
+	lcd_clear(&Robot.lcd);					//clear lcd
 	lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
-	Robot.record = false;						//set the default record to false
 
 	//select a mode
+	mode:
+	Robot.record = false;		//set the default record to false
+
 	while(!robot_isRecording() && !lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT)){
 		lcd_centerPrint(&Robot.lcd, TOP, "Select Mode");		//print lcd prompt
 		lcd_print(&Robot.lcd, BOTTOM, "REC         COMP");	//print lcd prompt
@@ -119,12 +131,14 @@ void robot_lcdMenu(){
 	}
 
 	lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
-	Robot.skills = false;						//set the defualt skills to false
 
 	//select a mode
+	skills:
+	Robot.skills = false;						//set the defualt skills to false
+
 	while(!robot_getSkills() && !lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT)){
 		lcd_centerPrint(&Robot.lcd, TOP, "Select Mode");		//print lcd prompt
-		lcd_print(&Robot.lcd, BOTTOM, "SKILLS      COMP");	//print lcd prompt
+		lcd_print(&Robot.lcd, BOTTOM, "SKILLS x    COMP");	//print lcd prompt
 
 		//competition selected
 		if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT))
@@ -133,18 +147,26 @@ void robot_lcdMenu(){
 		//skills selected
 		else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT))
 			Robot.skills = false;
+
+		//go back a step in the menu
+		else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_CENTER)){
+			lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
+			goto mode;											//go back to mode section
+		}
 	}
 
 	lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
 
 	//select competition settings
 	if(!robot_getSkills()){
-		Robot.alliance = NULL;	//set default alliance to null
 
 		//select an alliance
+		alliance:
+		Robot.alliance = NULL;	//set default alliance to null
+
 		while(robot_getAlliance() == NULL){
 			lcd_centerPrint(&Robot.lcd, TOP, "Select Alliance");	//print lcd prompt
-			lcd_print(&Robot.lcd, BOTTOM, "RED         BLUE");		//print lcd prompt
+			lcd_print(&Robot.lcd, BOTTOM, "RED    x    BLUE");		//print lcd prompt
 
 			//red alliance selected
 			if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT))
@@ -153,6 +175,12 @@ void robot_lcdMenu(){
 			//blue alliance selected
 			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT))
 				Robot.alliance = BLUE_ALLIANCE;
+
+			//go back a step in the menu
+			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_CENTER)){
+				lcd_waitForRelease(Robot.lcd);		//wait for the button to be released before proceeding
+				goto skills;											//go back to the skills section
+			}
 		}
 
 		lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
@@ -161,7 +189,7 @@ void robot_lcdMenu(){
 		//select a starting position
 		while(robot_getStartPos() == NULL){
 			lcd_centerPrint(&Robot.lcd, TOP, "Select Position");	//print lcd prompt
-			lcd_print(&Robot.lcd, BOTTOM, "POS 1      POS 2");		//print lcd prompt
+			lcd_print(&Robot.lcd, BOTTOM, "POS 1  x   POS 2");		//print lcd prompt
 
 			//red alliance selected
 			if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT))
@@ -170,6 +198,12 @@ void robot_lcdMenu(){
 			//blue alliance selected
 			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT))
 				Robot.startPos = POS_2;
+
+			//go back a step in the menu
+			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_CENTER)){
+				lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
+				goto alliance;									//go back to the alliance section
+			}
 		}
 		lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
 	}
