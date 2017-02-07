@@ -60,29 +60,33 @@ void operatorControl() {
 	lcd_centerPrint(&Robot.lcd, BOTTOM, "Control Mode");	//print to lcd
 
 	//continue to loop until competition is ended
-	while(!robot_isRecording()){
+	while(robot_getMode() == COMPETITION){
 		userControl();
 		delay(20);
 	}
 
-	//do record sequence for skills challenge (60 seconds)
-	if(robot_getSkills())
-		robot_record("sk.txt", 60000);
+	//test the autonomous selected
+	if(robot_getMode() == AUTONOMOUS)
+		autonomous();
 
-	//do record sequence for red alliance (15 seconds)
-	else if(robot_getAlliance() == RED_ALLIANCE){
-		if(robot_getStartPos() == POS_1)
-			robot_record("r1.txt", 15000);	//record autonomous at position 1
-		else
-			robot_record("r2.txt", 15000);	//record autonomous at position 2
-	}
-
-	//do record sequence for blue alliance (15 seconds)
-	else if(robot_getAlliance() == BLUE_ALLIANCE){
-		if(robot_getStartPos() == POS_1)
-			robot_record("b1.txt", 15000);	//record autonomous at position 1
-		else
-			robot_record("b2.txt", 15000);	//record autonomous at position 2
+	//record the autonomous selected
+	if(robot_getMode() == RECORD)
+		switch(robot_getAuton()){
+			case SKILLS:
+				robot_record("sk.txt", 60000);
+			break;
+			case AUTON1:
+				robot_record("a1.txt", 15000);
+			break;
+			case AUTON2:
+				robot_record("a2.txt", 15000);
+			break;
+			case AUTON3:
+				robot_record("a3.txt", 15000);
+			break;
+			case AUTON4:
+				robot_record("a4.txt", 15000);
+			break;
 	}
 
 	lcd_centerPrint(&Robot.lcd, TOP, "Rebooting");	//print to lcd

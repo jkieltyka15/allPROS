@@ -57,23 +57,22 @@ void autonomous() {
 	lcd_centerPrint(&Robot.lcd, TOP, "Autonomous Mode");	//print to lcd
 	lcd_centerPrint(&Robot.lcd, BOTTOM, "ACTIVE");			//print to lcd
 
-	//do replay sequence for skills challenge (60 seconds)
-	if(robot_getSkills())
-		robot_replay("sk.txt");
-
-	//do replay sequence for red alliance (15 seconds)
-	else if(robot_getAlliance() == RED_ALLIANCE){
-		if(robot_getStartPos() == POS_1)
-			robot_replay("r1.txt");	//replay autonomous at position 1
-		else
-			robot_replay("r2.txt");	//replay autonomous at position 2
-	}
-
-	//do replay sequence for blue alliance (15 seconds)
-	else if(robot_getAlliance() == BLUE_ALLIANCE){
-		if(robot_getStartPos() == POS_1)
-			robot_replay("b1.txt");	//replay autonomous at position 1
-		else
-			robot_replay("b2.txt");	//replay autonomous at position 2
+	//play the autonomous that was selected
+	switch(robot_getAuton()){
+		case SKILLS:
+			robot_replay("sk.txt");
+		break;
+		case AUTON1:
+			robot_replay("a1.txt");
+		break;
+		case AUTON2:
+			robot_replay("a2.txt");
+		break;
+		case AUTON3:
+			robot_replay("a3.txt");
+		break;
+		case AUTON4:
+			robot_replay("a4.txt");
+		break;
 	}
 }

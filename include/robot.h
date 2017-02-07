@@ -28,17 +28,24 @@
 
 #include <NDAPI.h>	//NDA API
 
-//alliances
-#define RED_ALLIANCE  1	//red alliance
-#define BLUE_ALLIANCE 2	//blue alliance
-
-//starting tiles
-#define POS_1 1	//first position
-#define POS_2 2	//second position
-
 //robot modes
+#define COMPETITION 0
+#define AUTONOMOUS  1
+#define RECORD 			2
+#define SENSORS 		3
+
+//robot autonomous
 #define SKILLS 0
-#define COMPETITION 1
+#define AUTON1 1
+#define AUTON2 2
+#define AUTON3 3
+#define AUTON4 4
+
+//robot sensors
+#define LIFT 0
+#define RIGHT_DRIVE 1
+#define LEFT_DRIVE 2
+#define TURN  3
 
 //controller type
 #define DRIVER  1	//the main driver controller
@@ -46,12 +53,10 @@
 
 //robot data structure
 struct{
-	char alliance;		//the robot's alliance
-	char startPos;		//the robot's starting position
-	bool skills;			//flag for if the robot is in a skills challenge or not
-	bool record;			//flag for if the robot is in the recording state or not
+	char mode;				//the current mode of the robot
+	char auton;				//the selected autonomous for the match
 	LCD lcd;					//the robot's LCD screen
-	int liftPos;			//the robot's current lift position
+	int liftPos;			//the robot's current target lift position
 	double liftConst;	//the robot's lift constant for PID, default is 0.7
 
 	//motor systems
@@ -72,11 +77,9 @@ struct{
 void robot_init();	//initialize the robot
 
 //getter methods
-char robot_getAlliance();			//retrieve the robot's alliance
-char robot_getStartPos();			//retrieve the robot's starting position
-bool robot_getSkills();				//retrieve the robot's skills state
+char robot_getAuton();				//retrieve the robot's autonomous for the match
+char robot_getMode();					//retrieve the robto's current mode
 int robot_getLiftPos();				//retrieve the robot's lift position
-bool robot_isRecording();			//determine if the robot is in recording mode
 double robot_getLiftConst();	//get the PID lift constant value
 
 //lcd methods

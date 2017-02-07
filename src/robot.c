@@ -32,30 +32,22 @@ void robot_init(){
 }
 
 /*
- * Retrieve the robot's alliance.
+ * Retrieve the robot's autonomous routine for the
+ * match.
  *
- * @return Robot's alliance.
+ * @return Robot's autonomous routine.
  */
-char robot_getAlliance(){
-	return Robot.alliance;
+char robot_getAuton(){
+	return Robot.auton;
 }
 
 /*
- * Retrieve the robot's starting position.
+ * Retrieve the robot's current mode.
  *
- * @return Robot's starting position.
+ * @return Robot's current mode.
  */
-char robot_getStartPos(){
-	return Robot.startPos;
-}
-
-/*
- * Retrieve the robot's skills state
- *
- * @return Robot's starting position.
- */
-bool robot_getSkills(){
-	return Robot.skills;
+char robot_getMode(){
+	return Robot.mode;
 }
 
 /*
@@ -65,15 +57,6 @@ bool robot_getSkills(){
  */
 int robot_getLiftPos(){
 	return Robot.liftPos;
-}
-
-/*
- * Retrieve if the robot is currently in record mode.
- *
- * @return If the robot is in record mode or not.
- */
-bool robot_isRecording(){
-	return Robot.record;
 }
 
 /*
@@ -113,101 +96,148 @@ void robot_lcdMenu(){
 	lcd_clear(&Robot.lcd);					//clear lcd
 	lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
 
-	//select a mode
-	mode:
-	Robot.record = false;		//set the default record to false
-
-	while(!robot_isRecording() && !lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT)){
-		lcd_centerPrint(&Robot.lcd, TOP, "Select Mode");		//print lcd prompt
-		lcd_print(&Robot.lcd, BOTTOM, "REC         COMP");	//print lcd prompt
-
-		//recording selected
-		if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT))
-			Robot.record = true;
-
-		//competition selected
-		else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT))
-			Robot.record = false;
-	}
-
-	lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
+	Robot.mode = SENSORS;															//set the default mode to SENSORS
 
 	//select a mode
-	skills:
-	Robot.skills = false;						//set the defualt skills to false
+	while(robot_getMode() == SENSORS){
+		Robot.mode = SENSORS;															//set the default mode to SENSORS
+		lcd_centerPrint(&Robot.lcd, TOP, "Select Mode");	//print lcd prompt
 
-	while(!robot_getSkills() && !lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT)){
-		lcd_centerPrint(&Robot.lcd, TOP, "Select Mode");		//print lcd prompt
-		lcd_print(&Robot.lcd, BOTTOM, "SKILLS x    COMP");	//print lcd prompt
+		//display modes and allow user to select robot mode
+		for(int i = 0; !lcd_buttonIsPressed(Robot.lcd, LCD_BTN_CENTER); i = i){
 
-		//competition selected
-		if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT))
-			Robot.skills = true;
-
-		//skills selected
-		else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT))
-			Robot.skills = false;
-
-		//go back a step in the menu
-		else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_CENTER)){
-			lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
-			goto mode;											//go back to mode section
-		}
-	}
-
-	lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
-
-	//select competition settings
-	if(!robot_getSkills()){
-
-		//select an alliance
-		alliance:
-		Robot.alliance = NULL;	//set default alliance to null
-
-		while(robot_getAlliance() == NULL){
-			lcd_centerPrint(&Robot.lcd, TOP, "Select Alliance");	//print lcd prompt
-			lcd_print(&Robot.lcd, BOTTOM, "RED    x    BLUE");		//print lcd prompt
-
-			//red alliance selected
-			if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT))
-				Robot.alliance = RED_ALLIANCE;
-
-			//blue alliance selected
-			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT))
-				Robot.alliance = BLUE_ALLIANCE;
-
-			//go back a step in the menu
-			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_CENTER)){
-				lcd_waitForRelease(Robot.lcd);		//wait for the button to be released before proceeding
-				goto skills;											//go back to the skills section
+			//Cycle through modes
+			if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT)){
+				i--;
+				lcd_waitForRelease(Robot.lcd);
 			}
+			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT)){
+				i++;
+				lcd_waitForRelease(Robot.lcd);
+			}
+
+			//allow selection to wrap around
+			if(i > SENSORS)
+				i = COMPETITION;
+			else if(i < COMPETITION)
+				i = SENSORS;
+
+			Robot.mode = i;											//set the current mode for the robot
+			lcd_clearLine(&Robot.lcd, BOTTOM);	//clear the bottom LCD line
+
+			//display the current mode choice
+			switch(i){
+				case COMPETITION:
+					lcd_print(&Robot.lcd, BOTTOM, "< COMPETITION  >");
+				break;
+				case AUTONOMOUS:
+					lcd_print(&Robot.lcd, BOTTOM, "<  AUTONOMOUS  >");
+				break;
+				case RECORD:
+					lcd_print(&Robot.lcd, BOTTOM, "<    RECORD    >");
+				break;
+				case SENSORS:
+					lcd_print(&Robot.lcd, BOTTOM, "<   SENSORS    >");
+				break;
+			}
+			delay(10);	//small delay to allow LCD to be readable
 		}
 
 		lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
-		Robot.startPos = NULL;					//set default starting position to null
+		lcd_clear(&Robot.lcd);					//clear the lcd screen
 
-		//select a starting position
-		while(robot_getStartPos() == NULL){
-			lcd_centerPrint(&Robot.lcd, TOP, "Select Position");	//print lcd prompt
-			lcd_print(&Robot.lcd, BOTTOM, "POS 1  x   POS 2");		//print lcd prompt
+		//cycle through sensors
+		for(int i = 0; robot_getMode() == SENSORS && !lcd_buttonIsPressed(Robot.lcd, LCD_BTN_CENTER); i = i){
 
-			//red alliance selected
-			if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT))
-				Robot.startPos = POS_1;
+			lcd_centerPrint(&Robot.lcd, BOTTOM, "<     MENU     >");	//print lcd prompt
 
-			//blue alliance selected
-			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT))
-				Robot.startPos = POS_2;
-
-			//go back a step in the menu
-			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_CENTER)){
-				lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
-				goto alliance;									//go back to the alliance section
+			//Cycle through modes
+			if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT)){
+				i--;
+				lcd_waitForRelease(Robot.lcd);
 			}
+			else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT)){
+				i++;
+				lcd_waitForRelease(Robot.lcd);
+			}
+
+			//allow selection to wrap around
+			if(i > TURN)
+				i = LIFT;
+			else if(i < LIFT)
+				i = TURN;
+
+			lcd_clearLine(&Robot.lcd, TOP);	//clear the LCD
+
+			//display the current mode choice
+			switch(i){
+				case LIFT:
+					lcdPrint(Robot.lcd.port, TOP, "Lift: %d", sensor_getValue(Robot.liftSensor));
+				break;
+				case RIGHT_DRIVE:
+					lcdPrint(Robot.lcd.port, TOP, "R. Drive: %d", sensor_getValue(Robot.rightDriveSensor));
+				break;
+				case LEFT_DRIVE:
+					lcdPrint(Robot.lcd.port, TOP, "L. Drive: %d", sensor_getValue(Robot.leftDriveSensor));
+				break;
+				case TURN:
+					lcdPrint(Robot.lcd.port, TOP, "Turn: %d", sensor_getValue(Robot.turnSensor));
+				break;
+			}
+			delay(10);	//small delay to allow LCD to be readable
 		}
 		lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
+		lcd_clear(&Robot.lcd);					//clear the lcd screen
 	}
-	lcd_clear(&Robot.lcd);	//clear the lcd screen
+
+	lcd_waitForRelease(Robot.lcd);										//wait for the button to be released before proceeding
+	lcd_clear(&Robot.lcd);														//clear the lcd screen
+  lcd_centerPrint(&Robot.lcd, TOP, "Select Auton");	//print lcd prompt
+
+	//select the autonomous
+	for(int i = 1; !lcd_buttonIsPressed(Robot.lcd, LCD_BTN_CENTER); i = i){
+
+		//Cycle through modes
+		if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_LEFT)){
+			i--;
+			lcd_waitForRelease(Robot.lcd);
+		}
+		else if(lcd_buttonIsPressed(Robot.lcd, LCD_BTN_RIGHT)){
+			i++;
+			lcd_waitForRelease(Robot.lcd);
+		}
+
+		//allow selection to wrap around
+		if(i > AUTON4)
+			i = SKILLS;
+		else if(i < SKILLS)
+			i = AUTON4;
+
+		Robot.auton = i;										//set the current mode for the robot
+		lcd_clearLine(&Robot.lcd, BOTTOM);	//clear the bottom LCD line
+
+		//display the current mode choice
+		switch(i){
+			case SKILLS:
+				lcd_print(&Robot.lcd, BOTTOM, "<    SKILLS    >");
+			break;
+			case AUTON1:
+				lcd_print(&Robot.lcd, BOTTOM, "< AUTONOMOUS 1 >");
+			break;
+			case AUTON2:
+				lcd_print(&Robot.lcd, BOTTOM, "< AUTONOMOUS 2 >");
+			break;
+			case AUTON3:
+				lcd_print(&Robot.lcd, BOTTOM, "< AUTONOMOUS 3 >");
+			break;
+			case AUTON4:
+				lcd_print(&Robot.lcd, BOTTOM, "< AUTONOMOUS 4 >");
+			break;
+		}
+		delay(10);	//small delay to allow LCD to be readable
+	}
+	lcd_waitForRelease(Robot.lcd);	//wait for the button to be released before proceeding
+	lcd_clear(&Robot.lcd);					//clear the lcd screen
 }
 
 /*
