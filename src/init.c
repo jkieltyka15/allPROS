@@ -88,6 +88,7 @@ void initialize() {
 
 	//initialize sensors
 	Robot.liftSensor = sensor_init(IME, I2C_1);	//set lift sensor to I2C 1
+	Robot.liftPos = 0;													//set default to down
 
 	//LCD
 	Robot.lcd = lcd_init(uart2);    //setup the robot's lcd

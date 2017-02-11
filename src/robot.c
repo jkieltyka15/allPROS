@@ -317,22 +317,22 @@ void robot_setDriveForSplit(char left, char right, unsigned int time){
  *
  * @param pos The desired lift position.
  */
-void robot_liftToPosition(int pos){
+ void robot_liftToPosition(int pos){
 
-	//it is the autonomous period
-	if(isAutonomous())
-		motorSystem_setTillPID(&Robot.lift, &Robot.liftSensor, robot_getLiftConst(), pos);
+ 	//it is the autonomous period
+ 	if(isAutonomous())
+ 		motorSystem_setTillPID(&Robot.lift, &Robot.liftSensor, robot_getLiftConst(), pos);
 
-	//it is op control period
-	else{
-		//update motor in PID loop until sensor target value is near
-		if(abs(sensor_getValue(Robot.liftSensor)) != pos || (pos - sensor_getValue(Robot.liftSensor)) * robot_getLiftConst() < 10)
-			motorSystem_setVelocity(&Robot.lift, (pos - sensor_getValue(Robot.liftSensor)));
+ 	//it is op control period
+ 	else{
+ 		//update motor in PID loop until sensor target value is near
+ 		if(sensor_getValue(Robot.liftSensor) != pos || (pos - sensor_getValue(Robot.liftSensor)) * robot_getLiftConst() < 10)
+ 			motorSystem_setVelocity(&Robot.lift, (pos - sensor_getValue(Robot.liftSensor)) * robot_getLiftConst());
 
-		//target position has been reached
-		else
-			motorSystem_stop(&Robot.lift);	//stop motor
-	}
+ 		//target position has been reached
+ 		else
+ 			motorSystem_stop(&Robot.lift);	//stop motor
+ 	}
 }
 
 /**

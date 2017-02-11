@@ -367,6 +367,7 @@ Sensor sensor_init(int sensorType, int port, ...){
 	else if(tmp.type == IME){
 		tmp.sensor = NULL;	//set the sensor to null
 		tmp.analog = false;	//not an analog sensor
+		imeInitializeAll();	//initialize all IME
 	}
 
 	//initialize quadrature motor encoder

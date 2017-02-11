@@ -47,6 +47,15 @@
 #define LEFT_DRIVE 2
 #define TURN  3
 
+//lift positions
+#define LIFT_MAX 6065
+#define LIFT_MIN 550
+#define LIFT_HALF 1200
+#define LIFT_SCORE 2410
+
+//lift increment
+#define LIFT_INCREMENT 20
+
 //controller type
 #define DRIVER  1	//the main driver controller
 #define PARTNER 2	//the partner driver controller
