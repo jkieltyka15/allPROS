@@ -60,12 +60,30 @@ int robot_getLiftPos(){
 }
 
 /*
+ * Retrieve the robot's current intake position.
+ *
+ * @return The robot's current intake position.
+ */
+int robot_getIntakePos(){
+	return Robot.intakePos;
+}
+
+/*
  * Retrieve the robot's PID lift constant value.
  *
  * @return Robot's PID lift constant value.
  */
 double robot_getLiftConst(){
 	return Robot.liftConst;
+}
+
+/*
+ * Retrieve the robot's PID intake constant value.
+ *
+ * @return Robot's PID intake constant value.
+ */
+double robot_getIntakeConst(){
+	return Robot.intakeConst;
 }
 
 /*
@@ -163,9 +181,9 @@ void robot_lcdMenu(){
 
 			//allow selection to wrap around
 			if(i > TURN)
-				i = LIFT;
+				i = INTAKE;
 			else if(i < LIFT)
-				i = TURN;
+				i = INTAKE;
 
 			lcd_clearLine(&Robot.lcd, TOP);	//clear the LCD
 
@@ -182,6 +200,9 @@ void robot_lcdMenu(){
 				break;
 				case TURN:
 					lcdPrint(Robot.lcd.port, TOP, "Turn: %d", sensor_getValue(Robot.turnSensor));
+				break;
+				case INTAKE:
+					lcdPrint(Robot.lcd.port, TOP, "Intake: %d", sensor_getValue(Robot.intakeSensor));
 				break;
 			}
 			delay(10);	//small delay to allow LCD to be readable
@@ -367,6 +388,39 @@ void robot_intakeStop(){
 }
 
 /*
+ * Have the robot's lift go to the desired position
+ *
+ * @param pos The desired lift position.
+ */
+ void robot_positionIntake(int pos){
+
+ 	//it is the autonomous period
+ 	if(isAutonomous())
+ 		motorSystem_setTillPID(&Robot.intake, &Robot.intakeSensor, robot_getIntakeConst(), pos);
+
+ 	//it is op control period
+ 	else{
+ 		//update motor in PID loop until sensor target value is near
+ 		if(sensor_getValue(Robot.intakeSensor) != pos || (pos - sensor_getValue(Robot.intakeSensor)) * robot_getIntakeConst() < 10)
+ 			motorSystem_setVelocity(&Robot.intake, (pos - sensor_getValue(Robot.intakeSensor)) * robot_getIntakeConst());
+
+ 		//target position has been reached
+ 		else
+ 			motorSystem_stop(&Robot.intake);	//stop motor
+ 	}
+}
+
+/**
+ * Set the PID intake constant value for the
+ * desired intake behavior.
+ *
+ * @param val The new value for the lift constant.
+ */
+void robot_setIntakeConst(double val){
+	Robot.intakeConst = val;
+}
+
+/*
  * Free all sensors, sensor systems and motor systems that are associated
  * with the robot.
  */
@@ -382,5 +436,6 @@ void robot_free(){
 	sensor_free(&Robot.rightDriveSensor);	//free the right drive sensor
 	sensor_free(&Robot.leftDriveSensor);	//free the left drive sensor
 	sensor_free(&Robot.liftSensor);				//free the lift sensor
+	sensor_free(&Robot.intakeSensor);			//free the intake sensor
 	sensor_free(&Robot.turnSensor);				//free the turn sensor
 }

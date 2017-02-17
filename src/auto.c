@@ -9,7 +9,7 @@
  *  Modified on: Dec 18, 2015
  *  	 Author: Notre Dame de la Baie Academy
  *      	   	 VEX Robotics Team 6001
- *      		 Jordan Kieltyka
+ *      		   Jordan Kieltyka
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

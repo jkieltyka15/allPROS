@@ -64,31 +64,12 @@ void initializeIO() {
  */
 void initialize() {
 
-	//create motors for every port
-	Motor m1 = motor_init(PORT_1, false);  //create motor for port 1
-	Motor m2 = motor_init(PORT_2, true); 	 //create motor for port 2
-	Motor m3 = motor_init(PORT_3, true); 	 //create motor for port 3
-	Motor m4 = motor_init(PORT_4, true); 	 //create motor for port 4
-	Motor m5 = motor_init(PORT_5, true);   //create motor for port 5
-	Motor m6 = motor_init(PORT_6, true); 	 //create motor for port 6
-	Motor m7 = motor_init(PORT_7, false);  //create motor for port 7
-	Motor m8 = motor_init(PORT_8, false);  //create motor for port 8
-	Motor m9 = motor_init(PORT_9, false);  //create motor for port 9
-	Motor m10 = motor_init(PORT_10, true); //create motor for port 10
-
 	//initialize the robot
 	robot_init();							//initialize the robot
-	robot_setLiftConst(0.7);	//set the lift constant
 
-	//initialize motor systems
-	Robot.rightDrive = motorSystem_init(3, &m7, &m8, &m9); //initialize right drive
-	Robot.leftDrive = motorSystem_init(3, &m2, &m3, &m4);  //initialize left drive
-	Robot.lift = motorSystem_init(2, &m5, &m6);						 //initialize lift
-	Robot.intake = motorSystem_init(2, &m1, &m10);				 //initialize claw
-
-	//initialize sensors
-	Robot.liftSensor = sensor_init(IME, I2C_1);	//set lift sensor to I2C 1
-	Robot.liftPos = 0;													//set default to down
+	/*
+	 * Place all robot initilization code here!!!
+	 */
 
 	//LCD
 	Robot.lcd = lcd_init(uart2);    //setup the robot's lcd

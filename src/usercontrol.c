@@ -31,22 +31,8 @@
  */
 void userControl(){
 
-	/* drive controls */
-	robot_joyDrive(DRIVER);	//control drive from joystick
+	/*
+	 * Place all robot joystick control code here!!!
+	 */
 
-	/* lift controls */
-	if(joystickGetDigital(DRIVER, 5, JOY_UP))					//increase lift position
-	 	motorSystem_setVelocity(&Robot.lift, 127);
-	else if(joystickGetDigital(DRIVER, 5, JOY_DOWN))	//decrease lift position
-	 	motorSystem_setVelocity(&Robot.lift, -127);
-	else
-		motorSystem_stop(&Robot.lift);	//stop lift
-
-	/* intake controls */
-	if(joystickGetDigital(DRIVER, 6, JOY_UP))					//open claw
-		robot_intakeIn();
-	else if(joystickGetDigital(DRIVER, 6, JOY_DOWN))	//close claw
-		robot_intakeOut();
-	else
-		robot_intakeStop();															//stop claw
 }
